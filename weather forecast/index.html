@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>Weather Forecast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <div class="app" id="app">
+
+    <!-- Background layers -->
+    <div class="bg-layer" id="bgLayer"></div>
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <div class="container">
+
+      <!-- Header -->
+      <header class="header">
+        <h1 class="header__title">
+          <span class="header__icon">🌤</span>
+          Weather Forecast
+        </h1>
+        <p class="header__sub">Live weather for any city worldwide</p>
+      </header>
+
+      <!-- Search -->
+      <div class="search-wrapper">
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search for a city..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <div class="search-spinner" id="searchSpinner"></div>
+          </div>
+          <button class="icon-btn" id="locateBtn" title="Use my location" aria-label="Use my location">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </button>
+          <button class="icon-btn unit-btn" id="unitBtn" title="Toggle temperature unit">°F</button>
+        </div>
+
+        <!-- Suggestions dropdown -->
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+
+      <!-- Error banner -->
+      <div class="error-banner" id="errorBanner" style="display:none">
+        <span>⚠️</span> <span id="errorMsg"></span>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading-state" id="loadingState" style="display:none">
+        <div class="loader"></div>
+        <p>Fetching weather data…</p>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-state__globe">🌍</div>
+        <h2>Search for a city</h2>
+        <p>Type a city name or tap the pin icon to use your location</p>
+      </div>
+
+      <!-- Weather content -->
+      <div class="weather" id="weatherContent" style="display:none">
+
+        <!-- Current weather card -->
+        <div class="card card--main">
+          <div class="card__top">
+            <div class="card__location">
+              <h2 id="cityName">—</h2>
+              <p id="cityRegion">—</p>
+              <p id="currentDate" class="card__date">—</p>
+            </div>
+            <div class="card__weather-icon" id="mainWeatherIcon">☀️</div>
+          </div>
+          <div class="card__bottom">
+            <div class="card__temp-block">
+              <div class="card__temp" id="currentTemp">—</div>
+              <div class="card__condition" id="currentCondition">—</div>
+            </div>
+            <div class="card__meta">
+              <div class="meta-row" id="feelsLikeRow">
+                <span class="meta-label">Feels like</span>
+                <span class="meta-val" id="feelsLike">—</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">💧 Humidity</span>
+                <span class="meta-val" id="humidity">—</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">💨 Wind</span>
+                <span class="meta-val" id="windSpeed">—</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">🌂 Rain chance</span>
+                <span class="meta-val" id="rainChance">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <p class="stat-label">Today's Range</p>
+            <div class="stat-range">
+              <span class="stat-min" id="todayMin">—</span>
+              <span class="stat-sep">·</span>
+              <span class="stat-max" id="todayMax">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Sunrise / Sunset</p>
+            <div class="stat-sun">
+              <span id="sunrise">—</span>
+              <span class="stat-sep">|</span>
+              <span id="sunset">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">UV Index</p>
+            <div class="stat-uv">
+              <span class="stat-uv-val" id="uvIndex">—</span>
+              <span class="stat-uv-label" id="uvLabel">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Max Wind</p>
+            <div class="stat-wind">
+              <span class="stat-wind-val" id="maxWind">—</span>
+              <span class="stat-wind-unit">km/h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forecast tabs -->
+        <div class="forecast-card">
+          <div class="tabs">
+            <button class="tab tab--active" id="tabHourly" data-tab="hourly">24-Hour Forecast</button>
+            <button class="tab" id="tabDaily" data-tab="daily">7-Day Forecast</button>
+          </div>
+
+          <!-- Hourly forecast -->
+          <div class="tab-panel" id="panelHourly">
+            <div class="hourly-scroll" id="hourlyList"></div>
+          </div>
+
+          <!-- Daily forecast -->
+          <div class="tab-panel" id="panelDaily" style="display:none">
+            <div class="daily-list" id="dailyList"></div>
+          </div>
+        </div>
+
+        <!-- Attribution -->
+        <p class="attribution">Powered by Open-Meteo — Free & Open-Source Weather API</p>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
